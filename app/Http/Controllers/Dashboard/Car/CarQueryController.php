@@ -18,11 +18,27 @@ class CarQueryController extends Controller
                 'c.id', 'c.name', 'c.created_at', 'u.name as creator'
             )
             ->join('users as u', 'u.id', 'c.created_by')
-            ->whereNull('c.deleted_at')
-            ->orderByDesc('created_at')
+            ->whereNull('c.deleted_at');
+
+        $this->filterIndex($request, $cars);
+
+        $cars = $cars
+            ->orderByDesc('c.id')
             ->paginate(10);
 
         return view('dashboard.car.index', compact('cars'));
+    }
+
+
+    private function filterIndex(Request $request, $cars): void
+    {
+        if ($request->name != null) {
+            $cars = $cars->where('c.name', 'like', "%$request->name%");
+        }
+
+        if ($request->creator != null) {
+            $cars = $cars->where('u.name', 'like', "%$request->creator%");
+        }
     }
 
     public function create()
@@ -40,5 +56,24 @@ class CarQueryController extends Controller
             abort(404);
 
         return view('dashboard.car.edit', compact('car'));
+    }
+
+    public function trash(Request $request)
+    {
+        $cars = Car::query()
+            ->from('cars as c')
+            ->select(
+                'c.id', 'c.name', 'c.created_at', 'u.name as creator'
+            )
+            ->join('users as u', 'u.id', 'c.created_by')
+            ->whereNotNull('c.deleted_at');
+
+        $this->filterIndex($request, $cars);
+
+        $cars = $cars
+            ->orderByDesc('c.id')
+            ->paginate(10);
+
+        return view('dashboard.car.trash', compact('cars'));
     }
 }

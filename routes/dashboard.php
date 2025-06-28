@@ -17,8 +17,14 @@ Route::group(['middleware' => ['dashboardAuthCheck']], function () {
         Route::get('/index', [CarQueryController::class, 'index'])->name('index');
         Route::get('/create', [CarQueryController::class, 'create'])->name('create');
         Route::get('/edit/{id}', [CarQueryController::class, 'edit'])->name('edit');
+        Route::get('/trash', [CarQueryController::class, 'trash'])->name('trash');
+
+
         Route::post('/create', [CarCommandController::class, 'store'])->name('store');
         Route::post('/update/{id}', [CarCommandController::class, 'update'])->name('update');
+        Route::get('/delete/{id}', [CarCommandController::class, 'delete'])->name('delete');
+        Route::get('/restore/{id}', [CarCommandController::class, 'restore'])->name('restore');
+
 
     });
 });
